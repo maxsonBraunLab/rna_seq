@@ -1,0 +1,13 @@
+name: rna-seq-fastp
+channels:
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - _openmp_mutex=5.1=1_gnu
+  - fastp=0.22.0=h2e03b76_0
+  - libgcc-ng=11.2.0=h1234567_1
+  - libgomp=11.2.0=h1234567_1
+  - libstdcxx-ng=11.2.0=h1234567_1
+  - zlib=1.2.13=h5eee18b_0
+prefix: /home/groups/MaxsonLab/kongg/anaconda3/envs/rna-seq-fastp

@@ -1,0 +1,7 @@
+name: star271a
+channels:
+  - bioconda
+  - defaults
+dependencies:
+  - star=2.7.1a=0
+prefix: /home/groups/MaxsonLab/kongg/anaconda3/envs/star271a

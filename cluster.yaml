@@ -1,0 +1,15 @@
+__default__:
+  time: '03:00:00'
+  partition: exacloud
+  job-name: '{rule}'
+  output: 'jobs/{rule}/{rule}_%j.out'
+  error: 'jobs/{rule}/{rule}_%j.err'
+  cpus-per-task: 4
+  mem: 16G
+STAR:
+  job-name: STAR
+  error: jobs/STAR/{wildcards.sample}.err
+  output: jobs/STAR/{wildcards.sample}.out
+  cpus-per-task: 12
+  mem: 64G
+
