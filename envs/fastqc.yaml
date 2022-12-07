@@ -1,4 +1,4 @@
-name: fastqc
+name: rna-seq-fastqc
 channels:
   - bioconda
   - defaults

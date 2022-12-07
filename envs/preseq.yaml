@@ -1,4 +1,4 @@
-name: preseq
+name: rna-seq-preseq
 channels:
   - bioconda
   - defaults

@@ -1,4 +1,4 @@
-name: samtools
+name: rna-seq-samtools
 channels:
   - bioconda
   - defaults

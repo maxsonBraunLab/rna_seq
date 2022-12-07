@@ -1,37 +1,76 @@
 # pipeline config ---------------------------------------------------------------------------------
 
 FASTQ_SCREEN_CONFIG: config/fastq_screen.conf
-DESEQ2_CONFIG: config/metadata.txt
 
 # read alignment + preprocessing ------------------------------------------------------------------
 
-GTF: /home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm39.104.gtf
+GTF:
   # /home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm39.104.gtf
   # /home/groups/MaxsonLab/indices/GRch38/STAR_index/Homo_sapiens.GRCh38.104.gtf
-STAR: /home/groups/MaxsonLab/indices/mm10/STAR_index
+
+STAR:
   # /home/groups/MaxsonLab/indices/mm10/STAR_index
   # /home/groups/MaxsonLab/indices/GRch38/STAR_index
-FASTA: /home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa
+
+FASTA:
   # /home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa
   # /home/groups/MaxsonLab/indices/GRch38/bowtie2/GCA_000001405.15_GRCh38_no_alt_analysis_set.fasta
-ASSEMBLY: mm10
+
+ASSEMBLY:
   # mm10
   # hg38
 
+# counts + feature filter -------------------------------------------------------------------------
+
 PROJECT_ID: "project_id"
+
+# types of features to retain. Can be a string or list of strings.
+# recommended options: ["protein_coding", "lncRNA", "miRNA", "snoRNA", "snRNA", "Mt_tRNA"]
+BIOTYPES: "protein_coding"
+
+ANNOTATION: "config/mouse-annotation.txt.gz"
+# config/human-annotation.txt.gz
+
+# type of annotation style in the STAR index.
+# Genes is when annotation style is gene name.
+ANNOTATION_STYLE: "Genes" # ["Genes", "UCSC", "ENSEMBL_ID", "REFSEQ", "NCBI"]
 
 # differential analysis ---------------------------------------------------------------------------
 
-# keep results with pval less than <padj_cutoff>
-padj_cutoff: 0.05
+DESEQ2_CONFIG: "config/metadata.txt"
+CONTRAST_COMBINATIONS: "config/contrast_combinations.txt"
+# an optional 2-column table (tab-separated format, no header) containing pairwise combinations to assess.
+# the order of conditions matter (column1-vs-column2) to facilitate biological interpretation.
 
-diffexp:
-  contrasts:
-    # should be in format:
-    # target-vs-baseline
-  groups:
-    # should be in format:
-    # - condition1
-    # - condition2
-    # - ...
-    # - baseline
+# CONTRAST_COMBINATIONS example:
+# TREATMENT_1 DMSO
+# TREATMENT_2 DMSO
+
+CONTRAST_GROUPS: "config/contrast_groups.txt"
+# an optional 1-column table containing all the conditions used for group DESeq2 analysis.
+# the order of conditions affect the plot order in the output heatmap. 
+
+# CONTRAST_GROUPS example:
+# TREATMENT_1
+# TREATMENT_2
+# DMSO
+
+REPLICATES: "config/replicates.yaml"
+# an optional file that lists biological replicates. Example below:
+# DMSO:
+#   DMSO_1
+#   DMSO_2
+#   DMSO_3
+# TREATMENT:
+#   TREATMENT_1
+#   TREATMENT_2
+#   TREATMENT_3
+# where DMSO/TREATMENT is a custom name, and {DMSO|TREATMENT}_1 are actual replicate names.
+# replicates will be inferred if this file is not provided.
+
+MERGE_METHOD: 'mean' # ['mean', 'median']
+# specify how should replicates be merged
+
+# List covariates in your analysis in the form of an R formula. Currently, only Condition is supported.
+MODEL: "~Condition"
+

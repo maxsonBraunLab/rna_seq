@@ -10,4 +10,4 @@ dependencies:
   - libgomp=11.2.0=h1234567_1
   - libstdcxx-ng=11.2.0=h1234567_1
   - zlib=1.2.13=h5eee18b_0
-prefix: /home/groups/MaxsonLab/kongg/anaconda3/envs/rna-seq-fastp
+
