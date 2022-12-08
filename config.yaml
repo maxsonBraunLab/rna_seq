@@ -1,11 +1,8 @@
-# pipeline config ---------------------------------------------------------------------------------
+# read alignment + preprocessing ------------------------------------------------------------------
 
 FASTQ_SCREEN_CONFIG: config/fastq_screen.conf
 
-# read alignment + preprocessing ------------------------------------------------------------------
-
-GTF:
-  # /home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm39.104.gtf
+GTF:  # /home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm39.104.gtf
   # /home/groups/MaxsonLab/indices/GRch38/STAR_index/Homo_sapiens.GRCh38.104.gtf
 
 STAR:
@@ -37,26 +34,30 @@ ANNOTATION_STYLE: "Genes" # ["Genes", "UCSC", "ENSEMBL_ID", "REFSEQ", "NCBI"]
 
 # differential analysis ---------------------------------------------------------------------------
 
+PADJ: 0.05
 DESEQ2_CONFIG: "config/metadata.txt"
-CONTRAST_COMBINATIONS: "config/contrast_combinations.txt"
-# an optional 2-column table (tab-separated format, no header) containing pairwise combinations to assess.
+CONTRASTS: "config/contrasts.txt"
+# a REQUIRED 2-column table (tab-separated format, no header) containing pairwise combinations to assess.
 # the order of conditions matter (column1-vs-column2) to facilitate biological interpretation.
 
-# CONTRAST_COMBINATIONS example:
+# CONTRASTS example:
 # TREATMENT_1 DMSO
 # TREATMENT_2 DMSO
 
-CONTRAST_GROUPS: "config/contrast_groups.txt"
-# an optional 1-column table containing all the conditions used for group DESeq2 analysis.
-# the order of conditions affect the plot order in the output heatmap. 
+GROUPS: "config/groups.txt"
+# an OPTIONAL 1-column table containing all the conditions used for group DESeq2 analysis.
+# the order of conditions affect the plot order in the output heatmap.
+# by default, use all the conditions in the metadata.
 
-# CONTRAST_GROUPS example:
+# GROUPS example:
 # TREATMENT_1
 # TREATMENT_2
 # DMSO
 
+MERGE_REPLICATES: True # [True, False]
+
 REPLICATES: "config/replicates.yaml"
-# an optional file that lists biological replicates. Example below:
+# an optional YAML file that lists biological replicates. Ignored if MERGE_REPLICATES is False. Example below:
 # DMSO:
 #   DMSO_1
 #   DMSO_2
@@ -66,11 +67,10 @@ REPLICATES: "config/replicates.yaml"
 #   TREATMENT_2
 #   TREATMENT_3
 # where DMSO/TREATMENT is a custom name, and {DMSO|TREATMENT}_1 are actual replicate names.
-# replicates will be inferred if this file is not provided.
+# MERGE_REPLICATES must be True and REPLICATES be populated to merge replicates. Reps will NOT be inferred.
 
-MERGE_METHOD: 'mean' # ['mean', 'median']
-# specify how should replicates be merged
+MERGE_METHOD: 'median' # ['mean', 'median']
+# specify how should replicates be merged. Unused if MERGE_REPLICATES = False.
 
 # List covariates in your analysis in the form of an R formula. Currently, only Condition is supported.
 MODEL: "~Condition"
-

@@ -6,6 +6,7 @@ library(tibble)
 library(dplyr)
 library(viridisLite)
 library(pheatmap)
+library(yaml)
 
 parallel <- FALSE
 if (snakemake@threads > 1) {
@@ -26,15 +27,15 @@ gene_names = counts |> pull(Genes)
 md = read.table(snakemake@input$md, header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
 rownames(md) = md$SampleID
 
-# subset md by config/contrast_groups.txt if provided
+# subset md by config/GROUPS.txt if provided
 # allow user to upload a contrast combination file for easier interpretation of the output
-if (file.exists(snakemake@config$CONTRAST_GROUPS)) {
+if (file.exists(snakemake@config$GROUPS)) {
 
 	# import contrast combination file
-	contrast_groups = read.table(snakemake@config$CONTRAST_GROUPS) |> pull(1)
+	groups = read.table(snakemake@config$GROUPS) |> pull(1)
 
-	# subset conditions in md with the conditions in config/contrast_groups.txt
-	md = md |> filter(Condition %in% contrast_groups)
+	# subset conditions in md with the conditions in config/GROUPS.txt
+	md = md |> filter(Condition %in% groups)
 }
 
 # make the md reflect the available sample names
@@ -69,7 +70,6 @@ rownames(sampleDistsMatrix) <- rld$SampleID
 colnames(sampleDistsMatrix) <- NULL
 
 distance_plot = paste0(snakemake@output$outdir, "/", snakemake@config$PROJECT_ID, "-group-sample-dists.pdf")
-
 pdf(distance_plot, width = 12, height = 12)
 pheatmap(sampleDistsMatrix,
 	fontsize = 12,
@@ -93,19 +93,18 @@ top_gene_indices <- head(order(res.lrt$padj), 50)
 top_ge = counts(dds.lrt, normalized=TRUE)[top_gene_indices, ]
 rownames(top_ge) = gene_names[top_gene_indices]
 
-top_50 = paste0(snakemake@output$outdir, "/", snakemake@config$PROJECT_ID, "-top-50-genes.pdf")
+top_50 = paste0(snakemake@output$outdir, "/", snakemake@config$PROJECT_ID, "-top-50-genes-heatmap.pdf")
 pdf(top_50, width = 12, height = 12)
 pheatmap(top_ge,
 	main = "Top 50 differential gene expression (DESeq2-normalized counts)",
 	scale = "row",
 	fontsize = 12,
 	cluster_rows = TRUE,
-	cluster_cols = TRUE,
-	col = colors_fwd
+	cluster_cols = TRUE
 )
 dev.off()
 
-### Gene expression - all genes
+### Gene expression - all genes by individual replicates
 all_ge = counts(dds.lrt, normalized=TRUE)
 rownames(all_ge) = gene_names
 all_ge = all_ge |>
@@ -114,15 +113,59 @@ all_ge = all_ge |>
 	as.matrix()
 all_ge = all_ge[apply(all_ge, 1, function(x) sd(x) != 0), ]
 
-counts_plot = paste0(snakemake@output$outdir, "/", snakemake@config$PROJECT_ID, "-counts-plot.pdf")
-pdf(counts_plot, width = 12, height = 12)
+all_genes_heatmap_individual = paste0(snakemake@output$outdir, "/", snakemake@config$PROJECT_ID, "-all-genes-heatmap-individual.pdf")
+pdf(all_genes_heatmap_individual, width = 12, height = 12)
 pheatmap(all_ge,
-	main = "All gene expression (DESeq2-normalized counts)",
+	main = "All gene expression (DESeq2-normalized counts) by individual samples",
 	scale = "row",
 	fontsize = 12,
 	cluster_rows = TRUE,
 	cluster_cols = TRUE,
-	col = colors_fwd,
 	show_rownames = FALSE
 )
 dev.off()
+
+### Gene expression - all genes by merged replicates
+
+if (snakemake@config$MERGE_REPLICATES) {
+
+	message("Merging replicates...")
+
+	# read YAML file
+	merge_scheme = read_yaml(snakemake@config$REPLICATES)
+	for (name in names(merge_scheme)) {
+
+		reps = merge_scheme[[name]]
+
+		if (snakemake@config$MERGE_METHOD == "mean") {
+			merged_counts = all_ge[, reps] |> apply(MARGIN = 1, FUN = mean) # same as rowMeans(counts[, reps])
+		} else if (snakemake@config$MERGE_METHOD == "median") {
+			merged_counts = all_ge[, reps] |> apply(MARGIN = 1, FUN = median)
+		} else {
+			stop("ERROR: MERGE_METHOD must be either 'mean' or 'median'")
+		}
+
+		all_ge = all_ge |>
+			as.data.frame() |>
+			mutate(!!enexpr(name) := merged_counts) |>
+			select(!all_of(reps)) |>
+			as.matrix()
+		}
+
+	# remove rows with sd=0 one more time.
+	all_ge = all_ge[apply(all_ge, 1, function(x) sd(x) != 0), ]
+
+	# define output
+	all_genes_heatmap_merged = paste0(snakemake@output$outdir, "/", snakemake@config$PROJECT_ID, "-all-genes-heatmap-merged.pdf")
+	pdf(all_genes_heatmap_merged, width = 12, height = 12)
+	pheatmap(all_ge,
+		main = "All gene expression (DESeq2-normalized counts) by merged samples",
+		scale = "row",
+		fontsize = 12,
+		cluster_rows = TRUE,
+		cluster_cols = FALSE, # this respects the order of replicates.yaml
+		show_rownames = FALSE
+	)
+	dev.off()
+
+}

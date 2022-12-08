@@ -6,18 +6,21 @@ Author: Garth Kong
 
 import os
 import sys
-import glob
-import pandas as pd
-import plotly as plt
-import plotly.graph_objects as go
+from glob import glob
+from pandas import read_csv
 from snakemake.utils import min_version
+from yaml import safe_load
+
 min_version("5.11")
+
 if sys.version_info < (3, 6):
 	sys.exit("Python version is less than 3.6. Your python version:", sys.version_info)
 
 SAMPLES, = glob_wildcards("data/raw/{sample}_R1.fastq.gz")
-READS = sorted(glob.glob("data/raw/*.gz"))
-READS = [ os.path.basename(i).split(".")[0] for i in READS ]
+
+configfile: "config.yaml"
+
+singularity: "/home/groups/MaxsonLab/software/singularity-containers/4.12.0_sha256.7302640e37d37af02dd48c812ddf9c540a7dfdbfc6420468923943651f795591.sif"
 
 def message(msg):
 	sys.stderr.write("|--- " + msg + "\n")
@@ -25,15 +28,26 @@ def message(msg):
 for i in SAMPLES:
 	message("Processing " + i)
 
+def define_reads():
+	READS = sorted(glob("data/raw/*.gz"))
+	READS = [ os.path.basename(i).split(".")[0] for i in READS ]
+	return READS
+
+READS = define_reads()
+
 def defect_mode(wildcards, attempt):
 	if attempt == 1:
 		return ""
 	elif attempt > 1:
 		return "-D"
 
-configfile: "config.yaml"
+def define_contrasts(file = config["CONTRASTS"]):
+	contrasts = read_csv(file, sep = "\t", header = None)
+	contrast1 = contrasts[0]
+	contrast2 = contrasts[1]
+	return contrast1, contrast2
 
-singularity: "/home/groups/MaxsonLab/software/singularity-containers/4.12.0_sha256.7302640e37d37af02dd48c812ddf9c540a7dfdbfc6420468923943651f795591.sif"
+contrast1, contrast2 = define_contrasts()
 
 rule all:
 	input:
@@ -55,11 +69,14 @@ rule all:
 		expand("data/bigwig/{sample}.bw", sample = SAMPLES),
 		"data/counts/{}-raw-counts.txt".format(config["PROJECT_ID"]),
 		"data/counts/{}-raw-filtered-counts.txt".format(config["PROJECT_ID"]),
-		# DESeq2 --------------------------------------------------------------
+		# deseq2 --------------------------------------------------------------
 		"data/counts/{}-deseq2-norm.txt".format(config["PROJECT_ID"]),
 		"data/counts/{}-log2-deseq2-norm.txt".format(config["PROJECT_ID"]),
-		"data/DESeq2/pairwise",
-		"data/DESeq2/group"
+		"data/deseq2/group",
+		expand(["data/deseq2/pairwise/{c1}-vs-{c2}-all.txt",
+				"data/deseq2/pairwise/{c1}-vs-{c2}-pca.pdf",
+				"data/deseq2/pairwise/{{c1}}-vs-{{c2}}-{p}.txt".format(p = config["PADJ"]),
+		], zip, c1 = contrast1, c2 = contrast2)
 
 # pre-processing ----------------------------------------------------------------------------------
 
@@ -229,9 +246,9 @@ rule filter_counts:
 	script:
 		"scripts/filter_counts.py"
 
-# DESeq2 ------------------------------------------------------------------------------------------
+# deseq2 ------------------------------------------------------------------------------------------
 
-# output log2-transformed DESeq2-normalized counts table.
+# output log2-transformed deseq2-normalized counts table.
 rule deseq2_norm:
 	input:
 		counts = "data/counts/{}-raw-filtered-counts.txt".format(config["PROJECT_ID"]),
@@ -247,17 +264,23 @@ rule deseq2_norm:
 rule deseq2_pairwise:
 	input:
 		counts = "data/counts/{}-raw-filtered-counts.txt".format(config["PROJECT_ID"]),
-		md = "config/metadata.txt"
+		md = "config/metadata.txt",
+		contrasts = "config/contrasts.txt"
 	output:
-		outdir = directory("data/DESeq2/pairwise")
+		all_genes = "data/deseq2/pairwise/{c1}-vs-{c2}-all.txt",
+		sig_genes = "data/deseq2/pairwise/{{c1}}-vs-{{c2}}-{p}.txt".format(p = config["PADJ"]),
+		pca_plot = "data/deseq2/pairwise/{c1}-vs-{c2}-pca.pdf"
 	params:
 		model = config["MODEL"],
-		padj = config["PADJ_CUTOFF"]
+		padj = config["PADJ"],
+		c1 = "{c1}",
+		c2 = "{c2}",
+		outdir = "data/deseq2/pairwise"
 	conda:
 		"envs/deseq2.yaml"
 	threads: 4
 	log:
-		"data/logs/deseq2-pairwise.log"
+		"data/logs/deseq2-pairwise-{c1}-vs-{c2}.log"
 	script:
 		"scripts/deseq2-pairwise.R"
 
@@ -266,12 +289,12 @@ rule deseq2_group:
 		counts = "data/counts/{}-raw-filtered-counts.txt".format(config["PROJECT_ID"]),
 		md = "config/metadata.txt"
 	output:
-		outdir = directory("data/DESeq2/group")
+		outdir = directory("data/deseq2/group")
 	conda:
 		"envs/deseq2.yaml"
 	params:
 		model = config["MODEL"],
-		padj = config["PADJ_CUTOFF"]
+		padj = config["PADJ"]
 	conda:
 		"envs/deseq2.yaml"
 	log:
