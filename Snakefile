@@ -49,6 +49,15 @@ def define_contrasts(file = config["CONTRASTS"]):
 
 contrast1, contrast2 = define_contrasts()
 
+def detect_singularity():
+	from sys import argv
+	cmd = " ".join(sys.argv)
+	singularity_flag = "--use-singularity"
+	if cmd.find(singularity_flag) != -1:
+		return "true"
+	else:
+		return "false"
+
 rule all:
 	input:
 		# quality control -----------------------------------------------------
@@ -57,9 +66,7 @@ rule all:
 		expand("data/fastq_screen/{reads}_screen.txt", reads = READS),
 		expand("data/preseq/estimates_{sample}.txt", sample = SAMPLES),
 		expand("data/preseq/lcextrap_{sample}", sample = SAMPLES),
-		# "data/multiqc/multiqc_report.html",
-		# "data/fraglen.html",
-		# "data/frip.html",
+		"data/multiqc/multiqc_report.html",
 		# read alignment ------------------------------------------------------
 		expand([
 			"data/star/{sample}_bam/Aligned.sortedByCoord.out.bam",
@@ -129,18 +136,6 @@ rule fastq_screen:
 	threads: 8
 	shell:
 		"fastq_screen --aligner bowtie2 --threads {threads} --outdir data/fastq_screen --conf {input.config} --force {input.fastq} > {log} 2>&1"
-
-rule multiqc:
-	input:
-		expand("data/fastp/{sample}_{reads}.fastq.gz", sample = SAMPLES, reads = ["R1", "R2"]),
-		expand("data/fastqc/{reads}_fastqc.html", reads = READS),
-		expand("data/fastq_screen/{reads}_screen.txt", reads = READS)
-	output:
-		"data/multiqc/multiqc_report.html"
-	conda:
-		"envs/multiqc.yaml"
-	shell:
-		"multiqc -f data/ -o {output}"
 
 # read alignment ----------------------------------------------------------------------------------
 
@@ -224,6 +219,24 @@ rule bigwig:
 	threads: 12
 	shell:
 		"bamCoverage -b {input[0]} -o {output} -p {threads} --normalizeUsing CPM --binSize 10 --smoothLength 50"
+
+rule multiqc:
+	input:
+		expand("data/fastp/{sample}_{reads}.fastq.gz", sample = SAMPLES, reads = ["R1", "R2"]),
+		expand("data/fastqc/{reads}_fastqc.html", reads = READS),
+		expand("data/fastq_screen/{reads}_screen.txt", reads = READS),
+		expand("data/star/{sample}_bam/Aligned.sortedByCoord.out.bam", sample = SAMPLES),
+		expand("data/preseq/estimates_{sample}.txt", sample = SAMPLES),
+		expand("data/preseq/lcextrap_{sample}", sample = SAMPLES)
+	output:
+		"data/multiqc/multiqc_report.html"
+	params:
+		singularity = detect_singularity()
+	conda:
+		"envs/multiqc.yaml"
+	shell:
+		"if [ '{params.singularity}' == 'true' ]; then export LC_ALL=C.UTF-8; export LANG=C.UTF-8; fi && "
+		"multiqc data -f --ignore data/tmp -o data/multiqc 2>&1"
 
 # counts table ------------------------------------------------------------------------------------
 
