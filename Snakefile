@@ -58,6 +58,8 @@ def detect_singularity():
 	else:
 		return "false"
 
+singularity: "/home/groups/MaxsonLab/software/singularity-containers/4.12.0_sha256.7302640e37d37af02dd48c812ddf9c540a7dfdbfc6420468923943651f795591.sif"
+
 rule all:
 	input:
 		# quality control -----------------------------------------------------
