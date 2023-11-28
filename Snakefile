@@ -305,6 +305,7 @@ rule deseq2_pairwise:
 		sig_genes = "data/deseq2/pairwise/{{c1}}-vs-{{c2}}-{p}.txt".format(p = config["PADJ"]),
 		pca_plot = "data/deseq2/pairwise/{c1}-vs-{c2}-pca.pdf"
 	params:
+		use_singularity = detect_singularity(),
 		model = config["MODEL"],
 		padj = config["PADJ"],
 		c1 = "{c1}",
@@ -327,6 +328,7 @@ rule deseq2_group:
 	output:
 		outdir = directory("data/deseq2/group")
 	params:
+		use_singularity = detect_singularity(),
 		model = config["MODEL"],
 		padj = config["PADJ"]
 	conda:

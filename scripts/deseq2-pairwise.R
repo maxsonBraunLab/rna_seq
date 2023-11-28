@@ -9,7 +9,7 @@ library(pheatmap)
 library(yaml)
 
 parallel <- FALSE
-if (snakemake@threads > 1) {
+if (snakemake@threads > 1 & snakemake@params$use_singularity == "false") {
 	library("BiocParallel")
 	register(MulticoreParam(snakemake@threads))
 	parallel <- TRUE
