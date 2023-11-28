@@ -175,6 +175,7 @@ dependencies:
   - r-withr=2.5.0=r42hc72bb7e_1
   - r-xml=3.99_0.13=r42hed7f998_0
   - r-xtable=1.8_4=r42hc72bb7e_4
+  - r-yaml
   - readline=8.1.2=h0f457ee_0
   - sed=4.8=he412f7d_0
   - setuptools=65.5.1=pyhd8ed1ab_0
