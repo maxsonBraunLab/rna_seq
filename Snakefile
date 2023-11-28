@@ -20,7 +20,7 @@ SAMPLES, = glob_wildcards("data/raw/{sample}_R1.fastq.gz")
 
 configfile: "config.yaml"
 
-singularity: "/home/groups/MaxsonLab/software/singularity-containers/4.12.0_sha256.7302640e37d37af02dd48c812ddf9c540a7dfdbfc6420468923943651f795591.sif"
+# singularity: "/home/groups/MaxsonLab/software/singularity-containers/4.12.0_sha256.7302640e37d37af02dd48c812ddf9c540a7dfdbfc6420468923943651f795591.sif"
 
 def message(msg):
 	sys.stderr.write("|--- " + msg + "\n")
@@ -58,7 +58,6 @@ def detect_singularity():
 	else:
 		return "false"
 
-singularity: "/home/groups/MaxsonLab/software/singularity-containers/4.12.0_sha256.7302640e37d37af02dd48c812ddf9c540a7dfdbfc6420468923943651f795591.sif"
 
 rule all:
 	input:
@@ -98,6 +97,8 @@ rule fastp:
 		r2 = "data/fastp/{sample}_R2.fastq.gz"
 	conda:
 		"envs/fastp.yaml"
+	singularity:
+        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "fastp.sif")
 	log:
 		"data/logs/{sample}.fastp.json"
 	threads: 8
@@ -119,6 +120,8 @@ rule fastqc:
 		"data/fastqc/{read}_fastqc.html"
 	conda:
 		"envs/fastqc.yaml"
+	singularity:
+        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "fastqc.sif")
 	log:
 		"data/logs/fastqc_{read}.log"
 	threads: 4
@@ -133,6 +136,8 @@ rule fastq_screen:
 		"data/fastq_screen/{read}_screen.txt"
 	conda:
 		"envs/fastq_screen.yaml"
+	singularity:
+        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "fastq_screen.sif")
 	log:
 		"data/logs/fastq_screen_{read}.txt"
 	threads: 8
@@ -155,6 +160,8 @@ rule STAR:
 		genome_index=config["STAR"]
 	conda:
 		"envs/star.yaml"
+	singularity:
+        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "star.sif")
 	shell:
 		"STAR "
 		"--runThreadN {threads} "
@@ -176,6 +183,8 @@ rule index:
 		"data/star/{sample}_bam/Aligned.sortedByCoord.out.bam.bai"
 	conda:
 		"envs/samtools.yaml"
+	singularity:
+        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "samtools.sif")
 	threads: 4
 	shell:
 		"samtools index -@ {threads} {input}"
@@ -188,6 +197,8 @@ rule preseq:
 		"data/preseq/estimates_{sample}.txt"
 	conda:
 		"envs/preseq.yaml"
+	singularity:
+        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "preseq.sif")
 	resources:
 		defect_mode = defect_mode
 	log:
@@ -203,6 +214,8 @@ rule preseq_lcextrap:
 		"data/preseq/lcextrap_{sample}"
 	conda:
 		"envs/preseq.yaml"
+	singularity:
+        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "preseq.sif")
 	resources:
 		defect_mode = defect_mode
 	log:
@@ -218,6 +231,8 @@ rule bigwig:
 		"data/bigwig/{sample}.bw"
 	conda:
 		"envs/deeptools.yaml"
+	singularity:
+        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deeptools.sif")
 	threads: 12
 	shell:
 		"bamCoverage -b {input[0]} -o {output} -p {threads} --normalizeUsing CPM --binSize 10 --smoothLength 50"
@@ -236,6 +251,8 @@ rule multiqc:
 		singularity = detect_singularity()
 	conda:
 		"envs/multiqc.yaml"
+	singularity:
+        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "multiqc.sif")
 	shell:
 		"if [ '{params.singularity}' == 'true' ]; then export LC_ALL=C.UTF-8; export LANG=C.UTF-8; fi && "
 		"multiqc data -f --ignore data/tmp -o data/multiqc 2>&1"
@@ -267,20 +284,22 @@ rule filter_counts:
 rule deseq2_norm:
 	input:
 		counts = "data/counts/{}-raw-filtered-counts.txt".format(config["PROJECT_ID"]),
-		md = "config/metadata.txt"
+		md = config["DESEQ2_CONFIG"]
 	output:
 		norm_counts = "data/counts/{}-deseq2-norm.txt".format(config["PROJECT_ID"]),
 		log2_norm_counts = "data/counts/{}-log2-deseq2-norm.txt".format(config["PROJECT_ID"])
 	conda:
 		"envs/deseq2.yaml"
+	singularity:
+        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deseq2.sif")
 	script:
 		"scripts/deseq2-norm.R"
 
 rule deseq2_pairwise:
 	input:
 		counts = "data/counts/{}-raw-filtered-counts.txt".format(config["PROJECT_ID"]),
-		md = "config/metadata.txt",
-		contrasts = "config/contrasts.txt"
+		md = config["DESEQ2_CONFIG"],
+		contrasts = config["CONTRASTS"]
 	output:
 		all_genes = "data/deseq2/pairwise/{c1}-vs-{c2}-all.txt",
 		sig_genes = "data/deseq2/pairwise/{{c1}}-vs-{{c2}}-{p}.txt".format(p = config["PADJ"]),
@@ -293,6 +312,8 @@ rule deseq2_pairwise:
 		outdir = "data/deseq2/pairwise"
 	conda:
 		"envs/deseq2.yaml"
+	singularity:
+        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deseq2.sif")
 	threads: 4
 	log:
 		"data/logs/deseq2-pairwise-{c1}-vs-{c2}.log"
@@ -302,16 +323,16 @@ rule deseq2_pairwise:
 rule deseq2_group:
 	input:
 		counts = "data/counts/{}-raw-filtered-counts.txt".format(config["PROJECT_ID"]),
-		md = "config/metadata.txt"
+		md = config["DESEQ2_CONFIG"]
 	output:
 		outdir = directory("data/deseq2/group")
-	conda:
-		"envs/deseq2.yaml"
 	params:
 		model = config["MODEL"],
 		padj = config["PADJ"]
 	conda:
 		"envs/deseq2.yaml"
+	singularity:
+        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deseq2.sif")
 	log:
 		"data/logs/deseq2-group.log"
 	script:
