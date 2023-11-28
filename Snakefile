@@ -98,7 +98,7 @@ rule fastp:
 	conda:
 		"envs/fastp.yaml"
 	singularity:
-        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "fastp.sif")
+		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "fastp.sif")
 	log:
 		"data/logs/{sample}.fastp.json"
 	threads: 8
@@ -121,7 +121,7 @@ rule fastqc:
 	conda:
 		"envs/fastqc.yaml"
 	singularity:
-        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "fastqc.sif")
+		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "fastqc.sif")
 	log:
 		"data/logs/fastqc_{read}.log"
 	threads: 4
@@ -137,7 +137,7 @@ rule fastq_screen:
 	conda:
 		"envs/fastq_screen.yaml"
 	singularity:
-        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "fastq_screen.sif")
+		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "fastq_screen.sif")
 	log:
 		"data/logs/fastq_screen_{read}.txt"
 	threads: 8
@@ -161,7 +161,7 @@ rule STAR:
 	conda:
 		"envs/star.yaml"
 	singularity:
-        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "star.sif")
+		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "star.sif")
 	shell:
 		"STAR "
 		"--runThreadN {threads} "
@@ -184,7 +184,7 @@ rule index:
 	conda:
 		"envs/samtools.yaml"
 	singularity:
-        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "samtools.sif")
+		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "samtools.sif")
 	threads: 4
 	shell:
 		"samtools index -@ {threads} {input}"
@@ -198,7 +198,7 @@ rule preseq:
 	conda:
 		"envs/preseq.yaml"
 	singularity:
-        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "preseq.sif")
+		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "preseq.sif")
 	resources:
 		defect_mode = defect_mode
 	log:
@@ -215,7 +215,7 @@ rule preseq_lcextrap:
 	conda:
 		"envs/preseq.yaml"
 	singularity:
-        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "preseq.sif")
+		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "preseq.sif")
 	resources:
 		defect_mode = defect_mode
 	log:
@@ -232,7 +232,7 @@ rule bigwig:
 	conda:
 		"envs/deeptools.yaml"
 	singularity:
-        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deeptools.sif")
+		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deeptools.sif")
 	threads: 12
 	shell:
 		"bamCoverage -b {input[0]} -o {output} -p {threads} --normalizeUsing CPM --binSize 10 --smoothLength 50"
@@ -252,7 +252,7 @@ rule multiqc:
 	conda:
 		"envs/multiqc.yaml"
 	singularity:
-        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "multiqc.sif")
+		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "multiqc.sif")
 	shell:
 		"if [ '{params.singularity}' == 'true' ]; then export LC_ALL=C.UTF-8; export LANG=C.UTF-8; fi && "
 		"multiqc data -f --ignore data/tmp -o data/multiqc 2>&1"
@@ -291,7 +291,7 @@ rule deseq2_norm:
 	conda:
 		"envs/deseq2.yaml"
 	singularity:
-        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deseq2.sif")
+		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deseq2.sif")
 	script:
 		"scripts/deseq2-norm.R"
 
@@ -313,7 +313,7 @@ rule deseq2_pairwise:
 	conda:
 		"envs/deseq2.yaml"
 	singularity:
-        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deseq2.sif")
+		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deseq2.sif")
 	threads: 4
 	log:
 		"data/logs/deseq2-pairwise-{c1}-vs-{c2}.log"
@@ -332,7 +332,7 @@ rule deseq2_group:
 	conda:
 		"envs/deseq2.yaml"
 	singularity:
-        os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deseq2.sif")
+		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deseq2.sif")
 	log:
 		"data/logs/deseq2-group.log"
 	script:
