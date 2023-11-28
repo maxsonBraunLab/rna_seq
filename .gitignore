@@ -1,0 +1,5 @@
+data/
+jobs/
+.snakemake
+logs/
+.test
