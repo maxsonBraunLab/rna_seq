@@ -28,5 +28,5 @@ normCounts = counts(dds, normalized=TRUE)
 normCounts = 0.1 + normCounts # ensure nonzero
 log2normCounts = log2(normCounts)
 log2normCounts = as.data.frame(log2normCounts)
-write.table(normCounts, snakemake@output$norm_counts, sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
-write.table(log2normCounts, snakemake@output$log2_norm_counts, sep = "\t", row.names = FALSE, col.names = TRUE, quote = FALSE)
+write.table(normCounts, snakemake@output$norm_counts, sep = "\t", row.names = TRUE, col.names = TRUE, quote = FALSE)
+write.table(log2normCounts, snakemake@output$log2_norm_counts, sep = "\t", row.names = TRUE, col.names = TRUE, quote = FALSE)
