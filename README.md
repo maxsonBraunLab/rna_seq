@@ -3,6 +3,8 @@
 [![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
 [![snakemake minimum](https://img.shields.io/badge/snakemake->=5.32-<COLOR>.svg)](https://shields.io/)
 ![Maintainer](https://img.shields.io/badge/maintainer-gartician-blue)
+![Maintainer](https://img.shields.io/badge/maintainer-bioThai-blue)
+
 
 This SnakeMake pipeline processes aligns bulk RNA-Seq datasets using STAR and finds differential gene expression between conditions using DESeq2. 
 
