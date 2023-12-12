@@ -9,7 +9,7 @@ library(pheatmap)
 library(yaml)
 
 parallel <- FALSE
-if (snakemake@threads > 1) {
+if (snakemake@threads > 1 & snakemake@params$use_singularity == "false") {
 	library("BiocParallel")
 	register(MulticoreParam(snakemake@threads))
 	parallel <- TRUE
@@ -23,8 +23,7 @@ contrast_name = paste0(snakemake@params$c1, '-vs-', snakemake@params$c2)
 # import data -------------------------------------------------------------------------------------
 
 # import counts
-counts = read.table(snakemake@input$counts, sep = "\t", header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)
-gene_names = counts |> pull(Genes)
+counts = read.table(snakemake@input$counts, sep = "\t", header = TRUE, stringsAsFactors = FALSE, check.names = FALSE, row.names = "Genes")
 
 # import metdata
 md = read.table(snakemake@input$md, header = TRUE, stringsAsFactors = FALSE, check.names = FALSE)

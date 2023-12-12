@@ -20,7 +20,7 @@ output = snakemake@output[['rds']]
 rld_out = snakemake@output[['rld_out']]
 
 parallel <- FALSE
-if (snakemake@threads > 1) {
+if (snakemake@threads > 1 & snakemake@params$use_singularity == "false") {
     library("BiocParallel")
     # setup parallelization
     register(MulticoreParam(snakemake@threads))
