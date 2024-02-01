@@ -19,16 +19,17 @@ cd rna_seq
 
 # create a folder to symlink files into
 mkdir -p data/raw
-ln -s /absolute/path/to/files/EXP0000001_sample_R1_S001.fastq.gz
-ln -s /absolute/path/to/files/EXP0000001_sample_R2_S001.fastq.gz
+ln -s /absolute/path/to/files/EXP0000001_sample_R1_S001.fastq.gz data/raw/
+ln -s /absolute/path/to/files/EXP0000001_sample_R2_S001.fastq.gz data/raw/
 ...
 
+# for convenience, cd into data/raw folder before renaming symlinks
 # rename symlinks to remove extraneous strings and match the following format:  {sample}_{R1|R2}.fastq.gz
 mv EXP0000001_sample_R1_S001.fastq.gz sample_R1.fastq.gz
 mv EXP0000001_sample_R2_S001.fastq.gz sample_R2.fastq.gz
 
-# make scripts executable
-chmod +x src/*.py src/*.sh *.sh
+# make pipeline scripts executable
+chmod +x scripts/*.py scripts/*.sh *.sh
 ```
 
 __IMPORTANT:__ Please double check your samples are in the following format before moving forward: `{sample}_{R1|R2}.fastq.gz`
