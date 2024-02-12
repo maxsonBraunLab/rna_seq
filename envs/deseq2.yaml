@@ -131,6 +131,7 @@ dependencies:
   - r-futile.options=1.0.1=r42hc72bb7e_1003
   - r-generics=0.1.3=r42hc72bb7e_1
   - r-ggplot2=3.4.0=r42hc72bb7e_0
+  - r-ggrepel
   - r-glue=1.6.2=r42h06615bd_1
   - r-gtable=0.3.1=r42hc72bb7e_1
   - r-httr=1.4.4=r42hc72bb7e_1
