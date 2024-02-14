@@ -2,6 +2,7 @@ sink(file(snakemake@log[[1]], open = "wt"), type = "message")
 
 library(DESeq2)
 library(ggplot2)
+library(ggrepel)
 library(tibble)
 library(dplyr)
 library(viridisLite)
@@ -49,13 +50,21 @@ stopifnot(rownames(md) == colnames(counts))
 # DESeq2 ------------------------------------------------------------------------------------------
 
 # differential expression
-dds = DESeqDataSetFromMatrix(countData = counts, colData = md, design = as.formula("~Condition"))
+dds = DESeqDataSetFromMatrix(countData = counts, colData = md, design = as.formula(snakemake@params$model))
 dds.lrt <- DESeq(dds, test="LRT", reduced=~1, parallel = parallel)
 res.lrt <- results(dds.lrt, cooksCutoff = Inf, independentFiltering=FALSE)
 
 # Obtain normalized counts
 # vsd = vst(dds.lrt, blind = FALSE)
 rld <- rlog(dds.lrt, blind=FALSE)
+
+
+# write outputs -----------------------------------------------------------------------------------
+
+# export deseq2 dds object
+rds_file <- file.path(snakemake@output$outdir, paste0(snakemake@config$PROJECT_ID, "-dds-group.rds")) # contain deseq2 dds object for downstream custom analysis/plots
+saveRDS(object = dds.lrt, file = rds_file)
+
 
 # visualization -----------------------------------------------------------------------------------
 
@@ -84,7 +93,12 @@ dev.off()
 ### PCA plot
 pca_plot = paste0(snakemake@output$outdir, "/", snakemake@config$PROJECT_ID, "-group-pca.pdf")
 pdf(pca_plot, width = 12, height = 12)
-plotPCA(rld, intgroup=c("Condition"))
+
+pca_plot <- plotPCA(rld, intgroup=c("Condition")) + 
+	geom_text_repel(aes(label = name)) +
+	labs(title = paste0(snakemake@config$PROJECT_ID, "-rld"))
+
+pca_plot
 dev.off()
 
 ### Gene expression - top 50 genes post DESeq2 normalization

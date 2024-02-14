@@ -288,6 +288,8 @@ rule deseq2_norm:
 	output:
 		norm_counts = "data/counts/{}-deseq2-norm.txt".format(config["PROJECT_ID"]),
 		log2_norm_counts = "data/counts/{}-log2-deseq2-norm.txt".format(config["PROJECT_ID"])
+	params:
+		model = config["MODEL"]
 	conda:
 		"envs/deseq2.yaml"
 	singularity:

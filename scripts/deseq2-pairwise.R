@@ -2,6 +2,7 @@ sink(file(snakemake@log[[1]], open = "wt"), type = "message")
 
 library(DESeq2)
 library(ggplot2)
+library(ggrepel)
 library(tibble)
 library(dplyr)
 library(viridisLite)
@@ -39,7 +40,7 @@ stopifnot(rownames(md) == colnames(counts))
 # DESeq2 ------------------------------------------------------------------------------------------
 
 # differential expression
-ddsMatrix = DESeqDataSetFromMatrix(countData = counts, colData = md, design = as.formula("~Condition"))
+ddsMatrix = DESeqDataSetFromMatrix(countData = counts, colData = md, design = as.formula(snakemake@params$model))
 dds <- DESeq(ddsMatrix, parallel = parallel)
 
 # Obtain normalized counts
@@ -49,6 +50,7 @@ rld <- rlog(dds, blind=FALSE)
 # write outputs -----------------------------------------------------------------------------------
 
 # define outputs
+rds_file <- file.path(outdir, paste0(contrast_name, "-dds-pairwise.rds")) # contain deseq2 dds object for downstream custom analysis/plots
 all_file = paste0(outdir, "/", contrast_name, "-all.txt") # contain all gene results for this pw comparison
 sig_file = paste0(outdir, "/", contrast_name, "-", snakemake@params$padj, ".txt") # contain significant gene results
 pw_pca = paste0(outdir, "/", contrast_name, "-pca.pdf") # pca of a subset of samples
@@ -66,9 +68,19 @@ all_sig = results_df |> filter(padj <= snakemake@params$padj)
 write.table(results_df, all_file, quote = FALSE, sep = "\t", row.names = FALSE)
 write.table(all_sig, sig_file, quote = FALSE, sep = "\t", row.names = FALSE)
 
+# export deseq2 dds object
+saveRDS(object = dds, file = rds_file)
+
+# visualization -----------------------------------------------------------------------------------
+
 # output PCA plot
 pdf(pw_pca, width = 12, height = 12)
-plotPCA(rld, intgroup=c("Condition"))
+
+pca_plot <- plotPCA(rld, intgroup=c("Condition")) +
+	geom_text_repel(aes(label = name)) +
+	labs(title = paste0(contrast_name, ", rld"))
+
+pca_plot
 dev.off()
 
 # plot MA

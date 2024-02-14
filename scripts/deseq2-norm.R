@@ -18,7 +18,7 @@ counts = counts[, rownames(md)]
 stopifnot(rownames(md) == colnames(counts))
 
 # create DESeq2 objects ---------------------------------------------------------------------------
-ddsMat = DESeqDataSetFromMatrix(countData = counts, colData = md, design = as.formula(snakemake@config$MODEL))
+ddsMat = DESeqDataSetFromMatrix(countData = counts, colData = md, design = as.formula(snakemake@params$model))
 dds = DESeq(ddsMat)
 
 message('calculating deseq...')
