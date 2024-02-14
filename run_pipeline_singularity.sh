@@ -17,6 +17,7 @@
 
 # set folder paths
 # add absolute path to folder containing original fastq files (not the symlinks)
+# make sure paths contain NO spaces and NO special bash characters (&,!,?, etc.). Dashes, underscores, and dots in file/folder names are acceptable.
 indices_folder="/home/groups/MaxsonLab/indices"
 fastq_folder="/home/groups/MaxsonLab/nguythai/projects/pipeline_maintenance/Bulk-RNA-seq-pipeline-PE-singularity/Bulk-RNA-seq-pipeline-PE/.test/samples/raw"
 

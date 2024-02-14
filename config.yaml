@@ -60,7 +60,7 @@ GROUPS: "config/groups.txt"
 # TREATMENT_2
 # DMSO
 
-MERGE_REPLICATES: True # [True, False]
+MERGE_REPLICATES: False # [True, False]
 
 REPLICATES: "config/replicates.yaml"
 # an optional YAML file that lists biological replicates. Ignored if MERGE_REPLICATES is False. Example below:
@@ -78,5 +78,7 @@ REPLICATES: "config/replicates.yaml"
 MERGE_METHOD: 'median' # ['mean', 'median']
 # specify how should replicates be merged. Unused if MERGE_REPLICATES = False.
 
-# List covariates in your analysis in the form of an R formula. Currently, only Condition is supported.
+# List covariates in your analysis in the form of an R formula starting with "~". Currently, only Condition is supported.
+# the variable of interest for comparisons (eg, Condition) should be last at the end of the formula
+# all variables in formula should be spelled/formatted the same as the ones featured in the config/metadata.txt file
 MODEL: "~Condition"
