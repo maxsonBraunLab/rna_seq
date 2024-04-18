@@ -29,7 +29,7 @@ mv EXP0000001_sample_R1_S001.fastq.gz sample_R1.fastq.gz
 mv EXP0000001_sample_R2_S001.fastq.gz sample_R2.fastq.gz
 
 # make pipeline scripts executable
-chmod +x scripts/*.py scripts/*.sh *.sh
+chmod +x scripts/*.py *.sh
 ```
 
 __IMPORTANT:__ Please double check your samples are in the following format before moving forward: `{sample}_{R1|R2}.fastq.gz`
