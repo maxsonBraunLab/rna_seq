@@ -8,32 +8,27 @@ SINGULARITY_IMAGE_FOLDER: "/home/groups/MaxsonLab/software/singularity-container
 
 FASTQ_SCREEN_CONFIG: "config/fastq_screen.conf"
 
-GTF:  
-  # "/home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm39.104.gtf"
+GTF: "/home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm39.104.gtf"
   # "/home/groups/MaxsonLab/indices/GRch38/STAR_index/Homo_sapiens.GRCh38.104.gtf"
 
-STAR:
-  # "/home/groups/MaxsonLab/indices/mm10/STAR_index"
+STAR: "/home/groups/MaxsonLab/indices/mm10/STAR_index"
   # "/home/groups/MaxsonLab/indices/GRch38/STAR_index"
 
-FASTA:
-  # "/home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa"
+FASTA: "/home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa"
   # "/home/groups/MaxsonLab/indices/GRch38/bowtie2/GCA_000001405.15_GRCh38_no_alt_analysis_set.fasta"
 
-ASSEMBLY:
-  # "mm10"
+ASSEMBLY: "mm10"
   # "hg38"
 
 # counts + feature filter -------------------------------------------------------------------------
 # set your desired project ID here
-PROJECT_ID: "project_id"
+PROJECT_ID: "EXP123456JM_mouse_rnaseq"
 
 # types of features to retain. Can be a string or list of strings.
 # options: "protein_coding", "lncRNA", "miRNA", "snoRNA", "snRNA", "Mt_tRNA"
 BIOTYPES: "protein_coding"
 
-ANNOTATION: 
-  # "config/mouse-annotation.txt.gz"
+ANNOTATION: "config/mouse-annotation.txt.gz"
   # "config/human-annotation.txt.gz"
 
 # type of annotation style in the STAR index.
