@@ -37,7 +37,7 @@ __IMPORTANT:__ Please double check your samples are in the following format befo
 
 ## 2. Prepare your pipeline configurations
 
-To tailor the analysis to your needs, there are a series of files to edit before running the pipeline. Example formatting for the metadata, contrasts, groups, and replicates files can be found in the `config` folder.
+To tailor the analysis to your needs, there are a series of files to edit before running the pipeline. Example formatting for the config.yaml, metadata, contrasts, groups, and replicates files can be found in the `config` folder.
 
 1. `config.yaml`
 	* This file specifies pipeline runtime configurations, such as which STAR genomes to align to, feature biotypes to select (e.g. protein coding genes), and differential analysis schemes. 
@@ -68,7 +68,7 @@ If you do not have a Conda environment with Snakemake installed, please use one 
 
 ```bash
 # create an env with only snakemake inside of it
-mamba create -n snakemake -c bioconda -c conda-forge snakemake
+mamba create -n snakemake -c bioconda -c conda-forge snakemake=7.32
 ```
 
 ### 2. Activate Snakemake environment
