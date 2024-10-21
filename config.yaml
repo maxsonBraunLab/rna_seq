@@ -6,6 +6,9 @@ SINGULARITY_IMAGE_FOLDER: "/home/groups/MaxsonLab/software/singularity-container
 
 # read alignment + preprocessing ------------------------------------------------------------------
 
+# FASTA file containing additional list of sequences to trim from reads
+ADAPTER_FASTA: config/adapter_seqs.fa
+
 FASTQ_SCREEN_CONFIG: "config/fastq_screen.conf"
 
 GTF:  

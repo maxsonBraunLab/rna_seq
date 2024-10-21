@@ -62,7 +62,7 @@ def detect_singularity():
 rule all:
 	input:
 		# quality control -----------------------------------------------------
-		expand("data/fastp/{sample}_{read}.fastq.gz", sample = SAMPLES, read = ["R1", "R2"]),
+		# expand("data/fastp/{sample}_{read}.fastq.gz", sample = SAMPLES, read = ["R1", "R2"]),
 		expand("data/fastqc/{reads}_fastqc.html", reads = READS),
 		expand("data/fastq_screen/{reads}_screen.txt", reads = READS),
 		expand("data/preseq/estimates_{sample}.txt", sample = SAMPLES),
@@ -93,8 +93,10 @@ rule fastp:
 		r1 = "data/raw/{sample}_R1.fastq.gz",
 		r2 = "data/raw/{sample}_R2.fastq.gz"
 	output:
-		r1 = "data/fastp/{sample}_R1.fastq.gz",
-		r2 = "data/fastp/{sample}_R2.fastq.gz"
+		r1 = temp("data/fastp/{sample}_R1.fastq.gz"),
+		r2 = temp("data/fastp/{sample}_R2.fastq.gz")
+	params:
+		adapter_fasta_file = config["ADAPTER_FASTA"]
 	conda:
 		"envs/fastp.yaml"
 	singularity:
@@ -109,6 +111,8 @@ rule fastp:
 		"-o {output.r1} "
 		"-O {output.r2} "
 		"--detect_adapter_for_pe "
+		"--trim_poly_g "
+		"--adapter_fasta {params.adapter_fasta_file} "
 		"--thread {threads} "
 		"-j {log} "
 		"-h /dev/null"
