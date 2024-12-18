@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 #SBATCH --time 24:00:00
-#SBATCH --partition exacloud
+#SBATCH --partition batch
 #SBATCH --job-name run_pipeline 
 #SBATCH --output=jobs/run_pipeline_%j.log
 
@@ -15,7 +15,7 @@
 # To run this wrapper, do: sbatch run_pipeline_conda.sh
 
 # set the number of jobs to run at a time (no spaces)
-num_jobs=64
+num_jobs=50
 
 # run snakemake pipeline
 snakemake -j $num_jobs \

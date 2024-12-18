@@ -1,9 +1,9 @@
 __default__:
-  time: '03:00:00'
-  partition: exacloud
-  job-name: '{rule}'
-  output: 'jobs/{rule}/{rule}_%j.out'
-  error: 'jobs/{rule}/{rule}_%j.err'
+  time: "03:00:00"
+  partition: "batch"
+  job-name: "{rule}"
+  output: "jobs/{rule}/{rule}_%j.out"
+  error: "jobs/{rule}/{rule}_%j.err"
   cpus-per-task: 4
   mem: 8G
 bigwig:
