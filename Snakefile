@@ -103,7 +103,7 @@ rule fastp:
 		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "fastp.sif")
 	log:
 		"data/logs/{sample}.fastp.json"
-	threads: 8
+	threads: 4
 	shell:
 		"fastp "
 		"-i {input.r1} "
@@ -128,7 +128,7 @@ rule fastqc:
 		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "fastqc.sif")
 	log:
 		"data/logs/fastqc_{read}.log"
-	threads: 4
+	threads: 1
 	shell:
 		"fastqc -t {threads} --outdir data/fastqc {input} > {log} 2>&1"
 
@@ -158,7 +158,7 @@ rule STAR:
 		"data/star/{sample}_bam/Aligned.sortedByCoord.out.bam",
 		"data/star/{sample}_bam/ReadsPerGene.out.tab",
 		"data/star/{sample}_bam/Log.final.out"
-	threads: 12
+	threads: 8
 	params:
 		gtf=config["GTF"],
 		genome_index=config["STAR"]
@@ -189,7 +189,7 @@ rule index:
 		"envs/samtools.yaml"
 	singularity:
 		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "samtools.sif")
-	threads: 4
+	threads: 2
 	shell:
 		"samtools index -@ {threads} {input}"
 
@@ -237,7 +237,7 @@ rule bigwig:
 		"envs/deeptools.yaml"
 	singularity:
 		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deeptools.sif")
-	threads: 12
+	threads: 4
 	shell:
 		"bamCoverage -b {input[0]} -o {output} -p {threads} --normalizeUsing CPM --binSize 10 --smoothLength 50"
 
@@ -321,7 +321,7 @@ rule deseq2_pairwise:
 		"envs/deseq2.yaml"
 	singularity:
 		os.path.join(config["SINGULARITY_IMAGE_FOLDER"], "deseq2.sif")
-	threads: 4
+	threads: 1
 	log:
 		"data/logs/deseq2-pairwise-{c1}-vs-{c2}.log"
 	script:
