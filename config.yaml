@@ -12,7 +12,7 @@ ADAPTER_FASTA: config/adapter_seqs.fa
 FASTQ_SCREEN_CONFIG: "config/fastq_screen.conf"
 
 GTF:  
-  # "/home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm39.104.gtf"
+  # "/home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm38.102.gtf"
   # "/home/groups/MaxsonLab/indices/GRch38/STAR_index/Homo_sapiens.GRCh38.104.gtf"
 
 STAR:
@@ -20,7 +20,7 @@ STAR:
   # "/home/groups/MaxsonLab/indices/GRch38/STAR_index"
 
 FASTA:
-  # "/home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm39.dna_sm.primary_assembly.fa"
+  # "/home/groups/MaxsonLab/indices/mm10/STAR_index/Mus_musculus.GRCm38.dna_sm.primary_assembly.fa"
   # "/home/groups/MaxsonLab/indices/GRch38/bowtie2/GCA_000001405.15_GRCh38_no_alt_analysis_set.fasta"
 
 ASSEMBLY:
