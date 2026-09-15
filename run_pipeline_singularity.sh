@@ -2,6 +2,8 @@
 
 #SBATCH --time 24:00:00
 #SBATCH --partition batch
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=4G
 #SBATCH --job-name run_pipeline 
 #SBATCH --output=jobs/run_pipeline_%j.log
 
@@ -22,9 +24,6 @@ fastq_folder=""
 
 # set the number of jobs to run at a time (no spaces)
 num_jobs=50
-
-# # module load singularity before running snakemake (no longer needed for ARC partitions)
-# module load /etc/modulefiles/singularity/current
 
 # run snakemake pipeline
 # Note: if a separate Snakemake slurm profile for Singularity exists (e.g. slurm_singularity), you can use it instead of the default slurm profile
